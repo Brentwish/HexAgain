@@ -8,7 +8,6 @@ function Player(properties) {
 
 Player.prototype.turn = function() {
   this.moves -= 1;
-  this.board.turn();
 }
 
 Player.prototype.is_turn = function() {
