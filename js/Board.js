@@ -78,9 +78,9 @@ Board.prototype.do_key = function(k) {
   } else if (k == 69) { //e
     this.player.rotate_right();
   } else if (k == 83) { //s
-    this.player.move_backward();
+    this.player.move("backward");
   } else if (k == 87) { //w
-    this.player.move_forward();
+    this.player.move("forward");
   }
 }
 

@@ -24,18 +24,9 @@ Player.prototype.rotate_left = function() {
   this.orientation = ((this.orientation % 6) + 6 ) % 6;
 }
 
-Player.prototype.move_forward = function() {
-  h = hex_neighbor(this.hex, this.orientation);
-  h = this.board.hex_at(h.q, h.r, h.s);
-  if (h) {
-    this.board.update_hex(null, this.hex);
-    this.hex = h;
-    this.board.update_hex(this, this.hex);
-  }
-}
-
-Player.prototype.move_backward = function() {
-  h = hex_neighbor(this.hex, (this.orientation + 3) % 6);
+Player.prototype.move = function(dir) {
+  var orientation = (dir == "backward" ? ((this.orientation + 3) % 6) : this.orientation);
+  var h = hex_neighbor(this.hex, orientation);
   h = this.board.hex_at(h.q, h.r, h.s);
   if (h) {
     this.board.update_hex(null, this.hex);
