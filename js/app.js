@@ -1,6 +1,6 @@
 var CANVAS_WIDTH = "800";
 var CANVAS_HEIGHT = "800";
-var ORIGIN = Point(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+var ORIGIN = new Point(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
 var keys = new Set();
 var canvas;
 var ctx;

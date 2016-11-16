@@ -3,7 +3,7 @@ function Board(properties) {
   this.canvas = properties.canvas;
   this.ctx = properties.ctx;
   this.origin = properties.origin;
-  this.size = Point(20,20);
+  this.size = new Point(20,20);
   this.orientation = layout_flat;
   this.layout = Layout(this.orientation, this.size, this.origin)
 
@@ -15,7 +15,11 @@ function Board(properties) {
       var r1 = Math.max(-this.radius, -q - this.radius);
       var r2 = Math.min(this.radius, -q + this.radius);
       for (var r = r1; r <= r2; r++) {
-          tiles.push(Hex(q, r, -q-r, i));
+          var is_wall = false;
+          if (Math.abs(q) + Math.abs(r) + Math.abs(-q-r) == (2 * this.radius)) {
+            is_wall = true;
+          }
+          tiles.push(new Hex(q, r, -q-r, {index: i, is_wall: is_wall, type: is_wall ? "wall" : "default"}));
           i++;
       }
     }
@@ -28,7 +32,7 @@ function Board(properties) {
       board: this
     };
     var player = new Player(player_properties);
-    this.update_hex(player, player.hex);
+    this.update_hex("player", player.hex);
 
     return player;
   }).bind(this)();
@@ -84,11 +88,13 @@ Board.prototype.do_key = function(k) {
   }
 }
 
-Board.prototype.update_hex = function(p, h) {
-  if (p) {
-    h.color = p.color;
+Board.prototype.update_hex = function(type, hex) {
+  if (type) {
+    hex.set_type(type);
+    hex.set_color();
   } else {
-    h.color = h.default_color;
+    hex.set_type("default");
+    hex.set_color();
   }
 }
 

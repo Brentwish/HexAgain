@@ -1,37 +1,59 @@
+Colors = {
+  "default" : "grey",
+  "player" : "red",
+  "wall" : "black",
+  "hall" : "white"
+};
+
 function Point(x, y) {
-  return { x: x, y: y };
+  this.x = x;
+  this.y = y;
 }
 
-function Hex(q, r, s, i) {
-  return {
-    q: q,
-    r: r,
-    s: s,
-    index: i,
-    color: 'grey',
-    default_color: 'grey'
-  };
+function Hex(q, r, s, props) {
+  this.q = q;
+  this.r = r;
+  this.s = s;
+
+  if (!props) {
+    props = {};
+    props.index = null;
+    props.is_wall = null;
+    props.type = null;
+  }
+  this.index = props.index;
+  this.is_wall = props.is_wall;
+  this.type = props.type;
+  this.color = Colors[this.type];
+}
+
+Hex.prototype.set_color = function() {
+  this.color = Colors[this.type];
+}
+
+Hex.prototype.set_type = function(t) {
+  this.type = t;
 }
 
 function hex_add(a, b) {
-  return Hex(a.q + b.q, a.r + b.r, a.s + b.s);
+  return new Hex(a.q + b.q, a.r + b.r, a.s + b.s);
 }
 
 function hex_subtract(a, b) {
-  return Hex(a.q - b.q, a.r - b.r, a.s - b.s);
+  return new Hex(a.q - b.q, a.r - b.r, a.s - b.s);
 }
 
 function hex_scale(a, k) {
-  return Hex(a.q * k, a.r * k, a.s * k);
+  return new Hex(a.q * k, a.r * k, a.s * k);
 }
 
 var hex_directions = [
-  Hex(1, 0, -1), 
-  Hex(1, -1, 0), 
-  Hex(0, -1, 1), 
-  Hex(-1, 0, 1), 
-  Hex(-1, 1, 0), 
-  Hex(0, 1, -1)
+  new Hex(1, 0, -1),
+  new Hex(1, -1, 0),
+  new Hex(0, -1, 1),
+  new Hex(-1, 0, 1),
+  new Hex(-1, 1, 0),
+  new Hex(0, 1, -1)
 ];
 
 function hex_direction(direction) {
@@ -43,12 +65,12 @@ function hex_neighbor(hex, direction) {
 }
 
 var hex_diagonals = [
-  Hex(2, -1, -1), 
-  Hex(1, -2, 1), 
-  Hex(-1, -1, 2), 
-  Hex(-2, 1, 1), 
-  Hex(-1, 2, -1), 
-  Hex(1, 1, -2)
+  new Hex(2, -1, -1),
+  new Hex(1, -2, 1),
+  new Hex(-1, -1, 2),
+  new Hex(-2, 1, 1),
+  new Hex(-1, 2, -1),
+  new Hex(1, 1, -2)
 ];
 
 function hex_diagonal_neighbor(hex, direction) {
@@ -83,17 +105,17 @@ function hex_round(h) {
       {
           s = -q - r;
       }
-  return Hex(q, r, s);
+  return new Hex(q, r, s);
 }
 
 function hex_lerp(a, b, t) {
-  return Hex(a.q * (1 - t) + b.q * t, a.r * (1 - t) + b.r * t, a.s * (1 - t) + b.s * t);
+  return new Hex(a.q * (1 - t) + b.q * t, a.r * (1 - t) + b.r * t, a.s * (1 - t) + b.s * t);
 }
 
 function hex_linedraw(a, b) {
   var N = hex_distance(a, b);
-  var a_nudge = Hex(a.q + 0.000001, a.r + 0.000001, a.s - 0.000002);
-  var b_nudge = Hex(b.q + 0.000001, b.r + 0.000001, b.s - 0.000002);
+  var a_nudge = new Hex(a.q + 0.000001, a.r + 0.000001, a.s - 0.000002);
+  var b_nudge = new Hex(b.q + 0.000001, b.r + 0.000001, b.s - 0.000002);
   var results = [];
   var step = 1.0 / Math.max(N, 1);
   for (var i = 0; i <= N; i++)
@@ -121,7 +143,7 @@ function qoffset_to_cube(offset, h)
     var q = h.col;
     var r = h.row - Math.trunc((h.col + offset * (h.col & 1)) / 2);
     var s = -q - r;
-    return Hex(q, r, s);
+    return new Hex(q, r, s);
 }
 
 function roffset_from_cube(offset, h)
@@ -136,7 +158,7 @@ function roffset_to_cube(offset, h)
     var q = h.col - Math.trunc((h.row + offset * (h.row & 1)) / 2);
     var r = h.row;
     var s = -q - r;
-    return Hex(q, r, s);
+    return new Hex(q, r, s);
 }
 
 function Orientation(f0, f1, f2, f3, b0, b1, b2, b3, start_angle) {
@@ -158,7 +180,7 @@ function hex_to_pixel(layout, h)
     var origin = layout.origin;
     var x = (M.f0 * h.q + M.f1 * h.r) * size.x;
     var y = (M.f2 * h.q + M.f3 * h.r) * size.y;
-    return Point(x + origin.x, y + origin.y);
+    return new Point(x + origin.x, y + origin.y);
 }
 
 function pixel_to_hex(layout, p)
@@ -166,10 +188,10 @@ function pixel_to_hex(layout, p)
     var M = layout.orientation;
     var size = layout.size;
     var origin = layout.origin;
-    var pt = Point((p.x - origin.x) / size.x, (p.y - origin.y) / size.y);
+    var pt = new Point((p.x - origin.x) / size.x, (p.y - origin.y) / size.y);
     var q = M.b0 * pt.x + M.b1 * pt.y;
     var r = M.b2 * pt.x + M.b3 * pt.y;
-    return Hex(q, r, -q - r);
+    return new Hex(q, r, -q - r);
 }
 
 function hex_corner_offset(layout, corner)
@@ -177,7 +199,7 @@ function hex_corner_offset(layout, corner)
     var M = layout.orientation;
     var size = layout.size;
     var angle = 2.0 * Math.PI * (M.start_angle - corner) / 6;
-    return Point(size.x * Math.cos(angle), size.y * Math.sin(angle));
+    return new Point(size.x * Math.cos(angle), size.y * Math.sin(angle));
 }
 
 function polygon_corners(layout, h)
@@ -187,7 +209,7 @@ function polygon_corners(layout, h)
     for (var i = 0; i < 6; i++)
     {
         var offset = hex_corner_offset(layout, i);
-        corners.push(Point(center.x + offset.x, center.y + offset.y));
+        corners.push(new Point(center.x + offset.x, center.y + offset.y));
     }
     return corners;
 }

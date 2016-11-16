@@ -28,9 +28,17 @@ Player.prototype.move = function(dir) {
   var orientation = (dir == "backward" ? ((this.orientation + 3) % 6) : this.orientation);
   var h = hex_neighbor(this.hex, orientation);
   h = this.board.hex_at(h.q, h.r, h.s);
-  if (h) {
-    this.board.update_hex(null, this.hex);
+  if (this.is_available(h)) {
+    this.board.update_hex("default", this.hex);
     this.hex = h;
-    this.board.update_hex(this, this.hex);
+    this.board.update_hex("player", this.hex);
+  }
+}
+
+Player.prototype.is_available = function(h) {
+  if (h) {
+    return !h.is_wall;
+  } else {
+    return false
   }
 }
