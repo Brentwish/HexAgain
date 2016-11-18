@@ -2,7 +2,7 @@ Colors = {
   "default" : "grey",
   "player" : "red",
   "wall" : "black",
-  "hall" : "white"
+  "hall" : "grey"
 };
 
 function Point(x, y) {
@@ -10,29 +10,35 @@ function Point(x, y) {
   this.y = y;
 }
 
-function Hex(q, r, s, props) {
+function Hex(q, r, s, type, is_wall) {
   this.q = q;
   this.r = r;
   this.s = s;
+  this.type = type;
+  this.is_wall = is_wall;
 
-  if (!props) {
-    props = {};
-    props.index = null;
-    props.is_wall = null;
-    props.type = null;
+  this.has_player = false;
+  this.color = Colors[this.type];
+
+  this.default_settings = {
+    type : this.type,
+    has_player : false,
+    color : Colors[this.type]
+  };
+}
+
+Hex.prototype.update_state = function(state) {
+  state = state || this.default_settings;
+  this.color = Colors[state.type];
+  this.has_player = (state.type == "player" ? true : false);
+}
+
+Hex.prototype.is_vacant = function(state) {
+  var available = false;
+  if (state.type == "player") {
+    return !this.is_wall && !this.has_player;
   }
-  this.index = props.index;
-  this.is_wall = props.is_wall;
-  this.type = props.type;
-  this.color = Colors[this.type];
-}
-
-Hex.prototype.set_color = function() {
-  this.color = Colors[this.type];
-}
-
-Hex.prototype.set_type = function(t) {
-  this.type = t;
+  return available;
 }
 
 function hex_add(a, b) {

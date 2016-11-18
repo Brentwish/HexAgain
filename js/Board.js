@@ -19,7 +19,8 @@ function Board(properties) {
           if (Math.abs(q) + Math.abs(r) + Math.abs(-q-r) == (2 * this.radius)) {
             is_wall = true;
           }
-          tiles.push(new Hex(q, r, -q-r, {index: i, is_wall: is_wall, type: is_wall ? "wall" : "default"}));
+          var type = is_wall ? "wall" : "hall";
+          tiles.push(new Hex(q, r, -q-r, type, is_wall));
           i++;
       }
     }
@@ -32,7 +33,6 @@ function Board(properties) {
       board: this
     };
     var player = new Player(player_properties);
-    this.update_hex("player", player.hex);
 
     return player;
   }).bind(this)();
@@ -85,16 +85,6 @@ Board.prototype.do_key = function(k) {
     this.player.move("backward");
   } else if (k == 87) { //w
     this.player.move("forward");
-  }
-}
-
-Board.prototype.update_hex = function(type, hex) {
-  if (type) {
-    hex.set_type(type);
-    hex.set_color();
-  } else {
-    hex.set_type("default");
-    hex.set_color();
   }
 }
 
